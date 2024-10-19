@@ -1,10 +1,10 @@
 provider "aws"{
   access_key="AKIA4VDBMFEA4ZVDWM5O"
   secret_key=""
-  region="us-east-2"
+  region="eu-north-1"
 }
 
 resource "aws_instance" "MyFirstInstnace"{
-  ami = "ami-000e50175c5f86214"
+  ami = "ami-047bb4163c506cd98"
   instance_type="t2.micro"
 }
