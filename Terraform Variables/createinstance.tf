@@ -6,7 +6,7 @@ resource "aws_instance" "MyFirstInstance" {
         Name ="demoinstnce"
     }
 
-    security_group = var.SECURITY_GROUP
+    security_groups = var.SECURITY_GROUP
 
 
 }
