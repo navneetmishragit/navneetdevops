@@ -2,13 +2,7 @@ name: CI Workflow
 
 # Run workflow on specific events
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
+  workflow_dispatch:
 # Define the jobs in the workflow
 jobs:
   build-and-test:
