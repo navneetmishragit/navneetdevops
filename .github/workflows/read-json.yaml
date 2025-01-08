@@ -13,14 +13,14 @@ jobs:
         uses: actions/checkout@v3
 
       # Step 2: Install Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+      # - name: Set up Node.js
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: '18'
 
-      # Step 3: Install dependencies (if any)
-      - name: Install dependencies
-        run: npm install
+      # # Step 3: Install dependencies (if any)
+      # - name: Install dependencies
+      #   run: npm install
 
       # Step 4: Read and log JSON file
       - name: Read JSON File
