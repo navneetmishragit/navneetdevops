@@ -24,5 +24,6 @@ jobs:
 
       # Step 4: Read and log JSON file
       - name: Read JSON File
-        run: |
-          node -e "const fs = require('fs'); const data = JSON.parse(fs.readFileSync('./data.json', 'utf8')); console.log(data);"
+        # run: |
+        #   node -e "const fs = require('fs'); const data = JSON.parse(fs.readFileSync('./data.json', 'utf8')); console.log(data);"
+        run: jq '.' ./data.json
