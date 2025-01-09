@@ -1,3 +1,5 @@
-{"name": "Example","type": "workflow","enabled": true}
-{"name2": "Example2","type3": "workflow2","enabled2": false}
+[
+{"name": "Example","type": "workflow","enabled": true},
+{"name2": "Example2","type3": "workflow2","enabled2": false},
 {"name3": "Example2","type3": "workflow3","enabled3": true}
+]
