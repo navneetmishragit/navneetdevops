@@ -22,7 +22,7 @@ jobs:
       # - name: Install dependencies
       #   run: npm install
 
-      Step 4: Read and log JSON file
+      # Step 4: Read and log JSON file
       - name: Read JSON File
         run: |
           node -e "
