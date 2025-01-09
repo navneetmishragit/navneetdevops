@@ -1,40 +1,45 @@
-name: Read JSON File
+name: Iterate JSON and Hit API
 
 on:
-  workflow_dispatch: # Manual trigger
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
-  read-json:
+  process-json:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository
+      # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Install Node.js
-      # - name: Set up Node.js
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: '18'
+      # Step 2: Verify JSON file exists
+      - name: Verify JSON file
+        run: ls -la ./data.json
 
-      # # Step 3: Install dependencies (if any)
-      # - name: Install dependencies
-      #   run: npm install
-
-      # Step 4: Read and log JSON file
-      # - name: Read JSON File
-      #   run: |
-      #     node -e "
-      #       const fs = require('fs');
-      #       const data = JSON.parse(fs.readFileSync('./data.json', 'utf8'));
-      #       for (const [key, value] of Object.entries(data)) {
-      #         console.log(\`\${key}: \${JSON.stringify(value)}\`);
-      #       }
-      #     "
-
-      - name: Read and parse JSON file
+      # Step 3: Iterate JSON and Call API
+      - name: Process JSON and Hit API
         run: |
-            cat ./data.json | jq -c '.[]' | while read -r item; do
-              echo "$item"
-            done
+          python3 -c "
+import json
+import requests
+
+# Load JSON data from file
+with open('./data.json', 'r') as file:
+    data = json.load(file)
+
+# API headers
+headers = {
+    'Content-Type': 'application/json',
+    'tenant-id': '${{ secrets.TENANT_ID }}',
+    'api-key': '${{ secrets.API_KEY }}'
+}
+
+# Process each object in the JSON file
+for item in data:
+    print(f'Processing item: {item}')
+    try:
+        response = requests.post('https://api.example.com/endpoint', json=item, headers=headers)
+        print(f'Status: {response.status_code}, Response: {response.text}')
+    except Exception as e:
+        print(f'Error processing item {item}: {e}')
+          "
