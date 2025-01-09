@@ -23,16 +23,18 @@ jobs:
       #   run: npm install
 
       # Step 4: Read and log JSON file
-      - name: Read JSON File
-        run: |
-          node -e "
-            const fs = require('fs');
-            const data = JSON.parse(fs.readFileSync('./data.json', 'utf8'));
-            for (const [key, value] of Object.entries(data)) {
-              console.log(\`\${key}: \${JSON.stringify(value)}\`);
-            }
-          "
-
-      # - name: Read and parse JSON file
+      # - name: Read JSON File
       #   run: |
-      #       jq '.' ./data.json
+      #     node -e "
+      #       const fs = require('fs');
+      #       const data = JSON.parse(fs.readFileSync('./data.json', 'utf8'));
+      #       for (const [key, value] of Object.entries(data)) {
+      #         console.log(\`\${key}: \${JSON.stringify(value)}\`);
+      #       }
+      #     "
+
+      - name: Read and parse JSON file
+        run: |
+            cat ./data.json | jq -c '.[]' | while read -r item; do
+              echo "$item" | jq .
+            done
