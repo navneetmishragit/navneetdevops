@@ -36,5 +36,5 @@ jobs:
       - name: Read and parse JSON file
         run: |
             cat ./data.json | jq -c '.[]' | while read -r item; do
-              echo "$item" | jq .
+              echo "$item"
             done
