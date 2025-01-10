@@ -18,28 +18,13 @@ jobs:
 
       # Step 3: Iterate JSON and Call API
       - name: Process JSON and Hit API
-        run: |
-          python3 -c "
-import json
-import requests
-
-# Load JSON data from file
-with open('./data.json', 'r') as file:
-    data = json.load(file)
-
-# API headers
-headers = {
-    'Content-Type': 'application/json',
-    'tenant-id': '${{ secrets.TENANT_ID }}',
-    'api-key': '${{ secrets.API_KEY }}'
-}
-
-# Process each object in the JSON file
-for item in data:
-    print(f'Processing item: {item}')
-    try:
-        response = requests.post('https://api.example.com/endpoint', json=item, headers=headers)
-        print(f'Status: {response.status_code}, Response: {response.text}')
-    except Exception as e:
-        print(f'Error processing item {item}: {e}')
-          "
+       run: |
+          cat ./data.json | jq -c '.[]' | while read -r item; do
+            echo "Processing item: $item"
+            curl -X POST \
+              -H "Content-Type: application/json" \
+              -H "tenant-id: ${{ secrets.TENANT_ID }}" \
+              -H "api-key: ${{ secrets.API_KEY }}" \
+              -d "$item" \
+              https://api.example.com/endpoint
+          done
