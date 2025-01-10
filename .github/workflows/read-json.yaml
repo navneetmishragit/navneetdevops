@@ -21,10 +21,10 @@ jobs:
        run: |
           cat ./data.json | jq -c '.[]' | while read -r item; do
             echo "Processing item: $item"
-            curl -X POST \
-              -H "Content-Type: application/json" \
-              -H "tenant-id: ${{ secrets.TENANT_ID }}" \
-              -H "api-key: ${{ secrets.API_KEY }}" \
-              -d "$item" \
-              https://api.example.com/endpoint
+            # curl -X POST \
+            #   -H "Content-Type: application/json" \
+            #   -H "tenant-id: ${{ secrets.TENANT_ID }}" \
+            #   -H "api-key: ${{ secrets.API_KEY }}" \
+            #   -d "$item" \
+            #   https://api.example.com/endpoint
           done
