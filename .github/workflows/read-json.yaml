@@ -80,4 +80,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: api-response-log
-          path: ${{ env.LOG_FILE }}
+          path: $LOG_FILE
