@@ -9,7 +9,7 @@ jobs:
       - ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Extract Tenant ID from Filename and Process JSON
         run: |
@@ -77,7 +77,7 @@ jobs:
           ls -l ${{ env.LOG_FILE }}
 
       - name: Upload API Response Log as Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: api-response-log
           path: ${{ env.LOG_FILE }}
