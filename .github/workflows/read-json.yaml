@@ -20,8 +20,8 @@ jobs:
             exit 1
           fi
 
-          ENTITY_NAME=$(echo "$JSON_FILE" | sed -E 's/([A-Za-z]+)_([A-Za-z]{2})\.json/\1/')
-          TENANT_ID=$(echo "$JSON_FILE" | sed -E 's/[A-Za-z]+_([A-Za-z]{2})\.json/\1/')
+          ENTITY_NAME=$(basename "$JSON_FILE" | sed -E 's/([A-Za-z]+)_([A-Za-z]{2})\.json/\1/')
+          TENANT_ID=$(basename "$JSON_FILE" | sed -E 's/[A-Za-z]+_([A-Za-z]{2})\.json/\1/')
 
           echo "📂 Using JSON File: $JSON_FILE"
           echo "🏢 Extracted Entity Name: $ENTITY_NAME"
