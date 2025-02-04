@@ -1,30 +1,83 @@
-name: Iterate JSON and Hit API
+name: Read JSON File
 
 on:
-  workflow_dispatch: # Allows manual triggering of the workflow
+  workflow_dispatch:
 
 jobs:
-  process-json:
-    runs-on: ubuntu-latest
-
+  read-json:
+    runs-on: 
+      - ubuntu-latest
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Verify JSON file exists
-      - name: Verify JSON file
-        run: ls -la ./data.json
-
-      # Step 3: Iterate JSON and Call API
-      - name: Process JSON and Hit API
+      - name: Extract Tenant ID from Filename and Process JSON
         run: |
-          cat ./data.json | jq -c '.[]' | while read -r item; do
-            echo "Processing item: $item"
-            curl -X POST \
+          # Locate JSON file safely
+          JSON_FILE=$(find . -maxdepth 1 -name "*.json" | head -n 1)
+          if [[ -z "$JSON_FILE" ]]; then
+            echo "❌ No JSON file found!"
+            exit 1
+          fi
+
+          ENTITY_NAME=$(echo "$JSON_FILE" | sed -E 's/([A-Za-z]+)_([A-Za-z]{2})\.json/\1/')
+          TENANT_ID=$(echo "$JSON_FILE" | sed -E 's/[A-Za-z]+_([A-Za-z]{2})\.json/\1/')
+
+          echo "📂 Using JSON File: $JSON_FILE"
+          echo "🏢 Extracted Entity Name: $ENTITY_NAME"
+          echo "🔑 Extracted Tenant ID: $TENANT_ID"
+
+          # Define absolute log file path
+          LOG_FILE="${{ github.workspace }}/${ENTITY_NAME}_${TENANT_ID}.log"
+          echo "LOG_FILE=$LOG_FILE" >> $GITHUB_ENV  # Export to GitHub Actions
+
+          echo "📝 Log file will be created at: $LOG_FILE"
+          echo "[" > "$LOG_FILE"
+
+          row_number=0
+          cat "$JSON_FILE" | jq -c '.[]' | while read -r item; do
+            row_number=$((row_number + 1))
+            echo "➡️ Processing row: $row_number"
+
+            curl_response=$(mktemp)
+            http_status=$(curl -s -o "$curl_response" -w "%{http_code}" \
               -H "Content-Type: application/json" \
-              -H "tenant-id: ${{ secrets.TENANT_ID }}" \
-              -H "api-key: ${{ secrets.API_KEY }}" \
+              -H "x-tenant-id: $TENANT_ID" \
+              -H "x-api-key: ${{ secrets.API_KEY }}" \
               -d "$item" \
-              https://api.example.com/endpoint
+              https://eu.api.daimlertruck.com/custicon-test/v1-dev/partner/$ENTITY_NAME)
+
+            api_response=$(cat "$curl_response")
+            rm "$curl_response"
+
+            log_entry=$(jq -n \
+              --arg status "$http_status" \
+              --arg message "$api_response" \
+              --argjson row "$row_number" \
+              '{http_status: $status, message: $message, row_number: $row}')
+
+            echo "$log_entry," >> "$LOG_FILE"
           done
+
+          sed -i '$ s/,$//' "$LOG_FILE"
+          echo "]" >> "$LOG_FILE"
+
+          # Ensure log file exists
+          if [[ ! -f "$LOG_FILE" ]]; then
+            echo "❌ Log file not found!"
+            exit 1
+          fi
+
+          echo "✅ Log file successfully created: $LOG_FILE"
+          ls -l "$LOG_FILE"
+
+      - name: Debug Log File Path
+        run: |
+          echo "Log file expected path: ${{ env.LOG_FILE }}"
+          ls -l ${{ env.LOG_FILE }}
+
+      - name: Upload API Response Log as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-response-log
+          path: ${{ env.LOG_FILE }}
